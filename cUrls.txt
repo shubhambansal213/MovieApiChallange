@@ -1,0 +1,57 @@
+Please add the cURLs of your tests here:
+
+# ============================================
+# Cinema API - Test cURLs
+# ============================================
+
+# 1. GET ALL MOVIES (from Provided API with caching)
+curl -X c -k
+
+# 2. GET MOVIE BY ID
+curl -X GET "https://localhost:7629/api/movies/tt1375666" -k
+
+# 3. GET ALL SHOWTIMES
+curl -X GET "https://localhost:7629/api/showtimes" -k
+
+# 4. GET SHOWTIME BY ID
+curl -X GET "https://localhost:7629/api/showtimes/1" -k
+
+# 5. CREATE NEW SHOWTIME
+curl -X POST "https://localhost:7629/api/showtimes" \
+  -H "Content-Type: application/json" \
+  -d "{\"movieId\":\"tt1375666\",\"sessionDate\":\"2024-12-25T19:00:00\",\"auditoriumId\":1}" -k
+
+# 6. RESERVE SEATS (Contiguous seats required)
+curl -X POST "https://localhost:7629/api/reservations" \
+  -H "Content-Type: application/json" \
+  -d "{\"showtimeId\":1,\"seats\":[{\"row\":1,\"seatNumber\":5},{\"row\":1,\"seatNumber\":6},{\"row\":1,\"seatNumber\":7}]}" -k
+
+# 7. RESERVE SEATS (This should fail - seats not contiguous)
+curl -X POST "https://localhost:7629/api/reservations" \
+  -H "Content-Type: application/json" \
+  -d "{\"showtimeId\":1,\"seats\":[{\"row\":1,\"seatNumber\":5},{\"row\":1,\"seatNumber\":7}]}" -k
+
+# 8. CONFIRM/BUY RESERVATION (Replace GUID with actual reservation ID from step 6)
+curl -X POST "https://localhost:7629/api/tickets/confirm" \
+  -H "Content-Type: application/json" \
+  -d "{\"reservationId\":\"YOUR-RESERVATION-GUID-HERE\"}" -k
+
+# 9. ALTERNATIVE: CONFIRM PAYMENT BY ROUTE
+curl -X PUT "https://localhost:7629/api/tickets/YOUR-RESERVATION-GUID-HERE/confirm" \
+  -H "Content-Type: application/json" -k
+
+# ============================================
+# Testing Validation Rules
+# ============================================
+
+# 10. Try to reserve already reserved seats (within 10 minutes) - Should FAIL
+curl -X POST "https://localhost:7629/api/reservations" \
+  -H "Content-Type: application/json" \
+  -d "{\"showtimeId\":1,\"seats\":[{\"row\":1,\"seatNumber\":5},{\"row\":1,\"seatNumber\":6}]}" -k
+
+# 11. Try to confirm expired reservation (wait 10+ minutes) - Should FAIL
+# First create reservation, wait 10+ minutes, then confirm
+
+# 12. Try to reserve already sold seats - Should FAIL
+# First reserve and confirm, then try to reserve same seats again
+
